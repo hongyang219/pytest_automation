@@ -1,24 +1,10 @@
-# ai_agent.py
-import os
-from openai import OpenAI
-from dotenv import load_dotenv
 from ai_utils import get_project_context
 from prompts import *
+from ai_config import *
 
 
-# API Key
-load_dotenv(override=True)
-API_KEY = os.getenv('DEEPSEEK_API_KEY')
-
-# Model
-DEEPSEEK = "deepseek-reasoner"
-deepseek_url = "https://api.deepseek.com"
-
-# 初始化客户端 (可以使用 OpenAI 或 兼容接口的 DeepSeek/Moonshot)
-client = OpenAI(
-    api_key=API_KEY,
-    base_url=deepseek_url,
-)
+client, MODEL = initialize_client(llm_type="local")
+FILE_PATH = "../tests/draft/test_search2_draft.py"
 
 SYSTEM_PROMPT = sp_case_design
 
@@ -44,15 +30,19 @@ def generate_test_from_comments(file_path, po_file):
     请读取上述测试文件中的注释 (TODO 或 docstring)，完善具体的测试用例代码。
     
     【实现原则】
+    必须使用pytest的各种装饰器来生成测试函数
     保留原有的 import 和结构，仅补充函数的具体实现。
     如果有需要的package，添加对应的import。
     为每一个步骤添加对应的注释。
+    Let's think step by step.
     """
 
-    print("🤖 Agent 正在思考并编写代码...")
+    print(f"🤖 Agent 正在使用{MODEL}思考并编写代码...")
+    # noinspection PyTypeChecker
     response = client.chat.completions.create(
-        model=DEEPSEEK,
+        model=MODEL,
         # extra_body={"thinking": {"type": "enabled"}},
+        temperature=0,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt}
@@ -93,9 +83,11 @@ def suggest_negative_cases(file_path, po_file):
     """
 
     print("🤖 Agent 正在分析并设计异常用例...")
+    # noinspection PyTypeChecker
     response = client.chat.completions.create(
-        model=DEEPSEEK,
+        model=MODEL,
         # extra_body={"thinking": {"type": "enabled"}},
+        temperature=0,
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt}
@@ -115,7 +107,7 @@ def suggest_negative_cases(file_path, po_file):
 # === 使用入口 ===
 if __name__ == "__main__":
     # 场景 1: 根据注释写代码
-    generate_test_from_comments(file_path="../tests/draft/test_search2_draft.py", po_file="baidu_pageobjects.py")
+    generate_test_from_comments(file_path=FILE_PATH, po_file="baidu_pageobjects.py")
 
     # 场景 2: 扩展异常测试
     pass
