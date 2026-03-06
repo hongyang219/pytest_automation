@@ -1,19 +1,27 @@
 import pytest
 import allure
-from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
-
+from search_engine_test.page_objects import baidu_pageobjects as baidu_po
 
 # 测试数据驱动：搜索 "pytest" 和 "selenium"
 @allure.feature("Search")
 @allure.story("Baidu")
-@pytest.mark.parametrize("search_key", ["pytest", "selenium"])
-def test_search_functionality(browser, search_key):
+@pytest.mark.parametrize("search_key", ["python", "selenium"])
+def test_baidu_search(browser, search_key):
     """
-    测试搜索功能
     :param browser: 从 conftest.py 注入的 webdriver 对象
     :param search_key: 参数化传入的搜索词
+
+    【Summary】
+    Test search function
+
+    【Steps】
+    1.Open webpage
+    2.Locate search bar
+    3.Input search key in search bar
+    4.Wait for page loading
+    5.Assert that the search results containing input search key
     """
     # 1. 打开网页
     url = "https://www.baidu.com"
@@ -23,7 +31,7 @@ def test_search_functionality(browser, search_key):
     # 2. 定位搜索框
     # 在实际项目中，这部分应该封装在 Page Object 中
     with allure.step("定位搜索框"):
-        search_input = browser.find_element(By.ID, "chat-textarea")
+        search_input = browser.find_element(*baidu_po.baidu_search_bar)
 
     # 3. 输入关键字并回车
     with allure.step(f"输入关键字 {search_key} 并搜索"):

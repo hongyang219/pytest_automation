@@ -10,6 +10,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 # 如果想整个测试过程只启动一次浏览器，可以改为 scope="session"
 @pytest.fixture(scope="function")
 def browser(request):
+    '''
+    Initiate browser default to Chrome
+    '''
     print("\n[Setup] 正在启动 Chrome 浏览器...")
     # 使用 WebDriver Manager 自动管理驱动
     service = Service(ChromeDriverManager().install())
